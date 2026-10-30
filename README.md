@@ -53,18 +53,59 @@ python3 build_feed.py -c my.json -o out.json   # 自定义配置与输出
 ```jsonc
 {
   "filter": {
-    "enabled": true,                       // 只想收宠物相关就保持 true
-    "includeAny": ["宠物", "猫", "饲料"]     // 命中任一关键词即保留
+    "enabled": true,                 // 只想收宠物相关就保持 true
+    "includeAny": ["宠物", "猫粮"],   // 垂类强词：命中任一即保留（中英双语）
+    "includeAll": ["标准", "电商"],   // 宽泛词：必须和强词同时命中才有效
+    "excludeAny": ["球队", "明星"]    // 命中即丢弃
   },
   "sources": [
-    { "name": "来源显示名", "url": "https://.../rss", "category": "data", "enabled": true }
+    {
+      "name": "来源显示名",
+      "url": "https://.../rss",
+      "category": "data",
+      "tier": "vertical",             // 见下方说明
+      "enabled": true
+    }
   ]
 }
 ```
 
+#### tier：垂类源 vs 泛资讯源（重要）
+
+| tier | 含义 | 行为 |
+|------|------|------|
+| `vertical` | 本身就是宠物 / 食品行业的垂类媒体 | **整源放行**，不做关键词过滤 |
+| `general` | 泛资讯源（财经 / 社会 / 时事） | 必须命中 `filter.includeAny` 才保留 |
+
+> **为什么需要 tier**：早期版本对所有源统一用关键词过滤，结果两个反向错误：
+> 1. 泛化词（"进口""标准""政策"）让时事新闻大量混入 —— "海南自贸港再迎政策支持"也算命中；
+> 2. 英文垂类源（Petfood Industry / PET worldwide）标题里没有中文关键词，10 条全被误杀。
+>
+> 分层之后：垂类源直接放行，泛资讯源走严格白名单，实测时事新闻 100% 拦下，
+> 行业新闻 40 条全保留。
+
+**不要往 `includeAny` 里加泛化词**（如 "进口""出口""标准""电商"），
+那些词放 `includeAll` 才有意义。
+
 `category` 是兜底分类，取值：`policy` 政策法规 / `factory` 工厂产能 /
 `capital` 资本融资 / `data` 行业数据 / `brand` 品牌动态。
 标题或摘要命中关键词时会自动改判，所以 `category` 只在匹配不到时生效。
+分类词表同时含中英文（英文垂类源必须靠英文词才能正确归类），
+与小程序端 `utils/newsFeed.js` 的 `CATEGORY_RULES` 保持一致。
+
+#### 当前内置的源
+
+| 源 | tier | 说明 |
+|----|------|------|
+| Petfood Industry | vertical | 美国宠物食品行业杂志，主力源 |
+| Pet Food Processing | vertical | 宠物食品加工技术（产线、配方、设备） |
+| PET worldwide | vertical | 欧洲宠物行业，覆盖品牌与渠道 |
+| Pet Food Institute | vertical | 美国宠物食品协会官方 |
+| Food Dive | general | 泛食品媒体，靠关键词捞宠物相关 |
+| 国家统计局 / 中新网 / 界面 / 人民网 | general | 泛资讯，靠关键词捞政策与数据 |
+
+**中文垂类源目前没找到可用的公开 RSS**（派读、狗民网、宠业家等均已失效或无 RSS），
+所以内容以英文行业媒体为主。如果你有更对口的源，直接加进 `sources.json` 即可。
 
 ---
 
@@ -196,10 +237,20 @@ git push -u origin main
 “Read and write permissions”**。
 （不设这一项的话，脚本能跑通但自动提交 feed.json 会失败。）
 
-**⑤ 手动触发一次，确认跑通**
+**⑤ 确认自动触发已生效**
 
-**Actions 标签页 → 左侧「刷新新闻订阅源」→ 右侧 Run workflow**。
-等 1~2 分钟，绿勾即成功。然后浏览器打开：
+工作流目前有三个触发器，**任选其一**即可：
+
+| 触发方式 | 什么时候跑 | 说明 |
+|---------|-----------|------|
+| `schedule` | 每天北京时间 **15:17** | 主力，无需干预 |
+| `push` | 你推 `build_feed.py` / `sources.json` / `index.html` / workflow 文件到 `main` 时 | 改配置后自动重建 |
+| `workflow_dispatch` | 手动点 **Actions → 左侧「刷新新闻订阅源」→ Run workflow** | 随时立即刷新 |
+
+> **注意**：自动提交 `feed.json` 本身**不会**触发 `push` 触发器
+> （`feed.json` 不在 `paths` 白名单里），否则会形成无限循环。
+
+验证：浏览器打开
 
 ```
 https://yr020816.github.io/petfood-news-feed/
@@ -294,7 +345,27 @@ Nginx 放一个 `feed.json`，写个 crontab：
 
 ### 4.2 小程序里添加订阅源
 
-小程序内：**我的 → 设置 → 新闻订阅源 → 添加订阅源**
+**默认已经配好了，不用手动加。**
+
+首次启动时 `store.init()` 会自动写入内置订阅源
+（`utils/newsFeed.js` 的 `DEFAULT_FEEDS[0]`）：
+
+| 字段 | 值 |
+|---|---|
+| 名称 | 猫粮行业动态（每日更新） |
+| 地址 | `https://yr020816.github.io/petfood-news-feed/feed.json` |
+| 分类 | brand（仅在标题匹配不到关键词时作为兜底） |
+
+打开小程序 → **经济新闻** 页，它会**自动静默同步**一次
+（距上次同步超过 `autoHours` 才拉，拉取失败不打扰用户）。
+想立刻看效果，进 **设置 → 新闻订阅源 → 立即同步**。
+
+> 域名还没在微信后台配好、或真机被拦截时，同步会失败并提示
+> 「请检查网络与 request 合法域名配置」——这不影响其他功能，
+> 先把 4.1 的域名配上即可。
+
+如果你想改用别的源（自己的接口 / 别的 RSS），
+在 **设置 → 新闻订阅源 → 添加订阅源** 里加就行，多个源会一起同步。
 
 | 字段 | 填什么 |
 |---|---|
@@ -302,8 +373,6 @@ Nginx 放一个 `feed.json`，写个 crontab：
 | 地址 | `https://yr020816.github.io/petfood-news-feed/feed.json` |
 | 类型 | **JSON** |
 | 启用 | 打开 |
-
-保存后回 **经济新闻** 页，点右上角 🔄 同步。
 
 ### 4.3 验证
 
@@ -331,6 +400,26 @@ Nginx 放一个 `feed.json`，写个 crontab：
 ---
 
 ## 五、常见问题
+
+**Q：Actions 跑完了但 Pages 上的 feed.json 还是旧的？**
+A：先看 workflow 的「提交更新」这一步是不是 success。如果是 success 但内容没变，
+说明聚合器抓到的内容和线上一样（正常）；如果这一步 failure，看日志里的具体报错：
+
+| 日志关键字 | 原因 | 解决 |
+|-----------|------|------|
+| `! [rejected] main -> main (fetch first)` | checkout 用了默认浅克隆（`fetch-depth: 1`），本地没有远端历史，push 被拒 | workflow 里给 `actions/checkout` 加 `fetch-depth: 0`，并在 push 前 `git pull --rebase`（本项目已修） |
+| `Permission denied` / `403` | Actions 的 workflow 权限是只读 | Settings → Actions → General → Workflow permissions 选 “Read and write permissions” |
+| `nothing to commit` | 内容确实没变化 | 正常，不是错误 |
+
+**Q：workflow 一天只跑一次，能不能多跑？**
+A：改 `refresh-feed.yml` 里的 `cron`。注意 **cron 是 UTC**，
+北京时间 = UTC + 8 小时。当前是 `"17 7 * * *"` = 北京时间 15:17。
+GitHub 整点任务排队严重，故意避开整点。
+
+**Q：改了 sources.json 但线上没变？**
+A：`sources.json` 在 `push` 触发器的 `paths` 白名单里，推上去就会自动重建。
+如果没生效，检查 Actions 里是不是有一个**旧 run 还在排队**（并发会串行化），
+或者手动点一次 Run workflow。
 
 **Q：推送时提示「暂时连不上 github.com」？**
 A：git push 访问的是 **github.com 主站**（不是 api.github.com），国内通常需要代理。
