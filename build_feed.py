@@ -40,7 +40,8 @@ from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
 # ------------------------------------------------------------------
-# 分类关键词（与 utils/newsFeed.js 的 CATEGORY_RULES 保持一致）
+# 分类关键词（中文与 utils/newsFeed.js 的 CATEGORY_RULES 对齐；
+# 英文词为本项目扩展——主要垂类源是英文媒体，不补英文会导致清一色落到 brand）
 # ------------------------------------------------------------------
 CATEGORY_RULES = [
     ("policy", [
@@ -48,27 +49,91 @@ CATEGORY_RULES = [
         "进口登记", "农业农村部", "市监", "食品安全", "GB/T", "征求意见", "整治",
         "处罚", "禁用", "限用", "管理办法", "条例", "新规", "实施", "公告", "目录",
         "规范", "合规", "标签规定", "饲料管理",
+        # 英文
+        "regulation", "regulatory", "compliance", "labeling", "labelling",
+        "fda", "aafco", "feed regulation", "safety standard", "traceability",
+        "recall", "ban", "mandate", "policy", "lawsuit", "declar", "certif",
     ]),
     ("factory", [
         "产能", "工厂", "代工", "产线", "投产", "扩产", "新建", "智能工厂", "基地",
         "供应链", "物流", "仓储", "产能规划", "gmp", "GMP", "车间",
+        # 英文
+        "manufactur", "production", "facility", "plant", "capacity", "factory",
+        "supply chain", "logistics", "warehouse", "co-manufactur", "co-packer",
+        "ingredient handling", "extruder", "production line", "plant-based",
     ]),
     ("capital", [
         "融资", "轮", "IPO", "上市", "投资", "并购", "收购", "估值", "股权",
         "募资", "港交所", "创业板", "财报", "营收", "净利", "业绩", "股价", "基金",
+        # 英文
+        "acquisition", "acquire", "merger", "merger", "funding", "raise",
+        "investment", "invest", "valuation", "stake", "series a", "series b",
+        "ipo", "revenue", "earnings", "profit", "shares", "expansion into",
+        "partner", "partnership", "joint venture",
     ]),
     ("data", [
         "白皮书", "数据", "报告", "规模", "亿元", "增长", "渗透率", "占比", "调研",
         "统计", "出货量", "复合增长", "市场规模", "销量", "消费额",
+        # 英文
+        "report", "survey", "study", "outlook", "market size", "forecast",
+        "data", "statistics", "growth", "percent", "consumption", "spending",
+        "opportunity", "trend", "analysis", "insight",
     ]),
     ("brand", [
         "发布", "上新", "新品", "联名", "签约", "代言", "渠道", "618", "双11",
         "预售", "涨价", "调价", "召回", "配方升级", "活动", "直播", "门店",
         "战略", "合作",
+        # 英文
+        "launch", "unveil", "introduc", "debut", "new product", "rebrand",
+        "packaging", "formula", "flavor", "flavour", "treat", "snack",
+        "brand", "campaign", "signing", "partnership", "collab",
+        "cat food", "dog food", "kibble", "pet food",
     ]),
 ]
 
 DEFAULT_CATEGORY = "brand"
+
+# ------------------------------------------------------------------
+# 关键词过滤表
+# ------------------------------------------------------------------
+# 设计要点（踩过的坑）：
+#   1) 早期版本把"进口/出口/标准/政策/电商"这类泛化词放进 includeAny，
+#      结果综合财经源的时事新闻全被放行（"海南自贸港再迎政策支持"也算命中），
+#      真正的宠物行业新闻反而因为不含中文关键词被误杀。
+#   2) 因此拆成三层：
+#      includeAny —— 必须命中的「垂类强词」，只保留宠物/食品行业的专属词。
+#      includeAll —— 可选的「宽泛词」，配合 tier:strong 才生效。
+#      excludeAny —— 命中即丢弃，用于排除明显跑题的条目。
+#   3) 源级别用 tier 区分：
+#      tier: "vertical" —— 本身就是垂类媒体，整源放行，不做关键词过滤。
+#      tier: "general"  —— 泛资讯源，必须命中 includeAny 才保留。
+#   4) 关键词表同时含中英文，因为 Petfood Industry 等源是英文。
+FILTER_INCLUDE_ANY = [
+    # 宠物主体
+    "宠物", "猫", "狗", "犬", "猫粮", "狗粮", "主粮", "冻干", "罐头", "零食",
+    "宠物食品", "宠物经济", "宠物行业", "宠物产业", "宠物医疗", "宠物用品",
+    "宠物营养", "养宠", "萌宠", "铲屎官", "猫舍", "犬舍", "猫用", "犬用",
+    # 英文
+    "pet food", "petfood", "pet industry", "pet nutrition", "pet supplement",
+    "pet treat", "petcare", "pet care", "companion animal", "dog food", "cat food",
+    "kibble", "pet owner", "pet brand", "pet manufacturer", "animal nutrition",
+    "pet food industry", "aafco", "fda", "wet food", "dry food", "treats for",
+]
+
+# 泛化词：只有和强词同时出现才算命中（用于 rescue 逻辑）
+FILTER_INCLUDE_ALL = [
+    "饲料", "代工", "食品", "营养", "配料", "原料", "烘焙", "会展", "展会",
+    "电商", "天猫", "京东", "零售", "工厂", "产能", "供应链", "白皮书",
+    "海关", "进出口", "标准", "监管", "政策", "法规", "备案", "收购", "投资", "融资",
+    "market", "industry", "manufactur", "supply chain", "retail", "e-commerce",
+    "trade", "regulation", "label", "ingredient", "consumer", "growth",
+]
+
+# 命中即丢弃（明显跑题）
+FILTER_EXCLUDE_ANY = [
+    "球队", "球员", "比赛", "演唱会", "电影票房", "明星", "离婚", "讣告",
+    "football", "nba", "movie", "celebrity", "obituary",
+]
 
 UA = ("Mozilla/5.0 (compatible; CatFoodFeedBot/1.0; "
       "+https://github.com/catfood-analyzer) Python-urllib")
@@ -134,6 +199,28 @@ def parse_date(raw):
     if m:
         return "%s-%02d" % (m.group(1), int(m.group(2)))
     return ""
+
+
+def date_from_url(url):
+    """
+    有些源（如 petworldwide.net）不在 item 里给 pubDate，
+    只把日期写在链接路径上：/content-1/news/2026/10/plus/xxx.html
+    这里做兜底提取，否则这类条目会因"无日期"被时间窗过滤掉。
+    """
+    if not url:
+        return ""
+    m = re.search(r"/(20\d{2})[-/](\d{1,2})(?:[-/](\d{1,2}))?(?:/|$)", url)
+    if not m:
+        return ""
+    y, mo, d = m.group(1), int(m.group(2)), m.group(3)
+    if not (1 <= mo <= 12):
+        return ""
+    if d:
+        dd = int(d)
+        if not (1 <= dd <= 31):
+            return ""
+        return "%s-%02d-%02d" % (y, mo, dd)
+    return "%s-%02d" % (y, mo)
 
 
 def fetch(url):
@@ -284,6 +371,9 @@ def normalize(raw, src):
     date = parse_date(str(pick(raw, (
         "date", "pubDate", "published_at", "published", "created",
         "time", "pubdate", "updated"))))
+    if not date:
+        # 兜底：从链接路径里抠日期（部分源只在 URL 上标日期）
+        date = date_from_url(url)
     raw_cat = str(pick(raw, ("category", "type", "tag", "channel"))).strip().lower()
     valid = {k for k, _ in CATEGORY_RULES}
     category = raw_cat if raw_cat in valid else ""
@@ -306,9 +396,20 @@ def build(config, out_path, dry_run=False):
     sources = config.get("sources", [])
     cutoff = (datetime.now() - timedelta(days=MAX_AGE_DAYS)).strftime("%Y-%m-%d")
 
+    flt = config.get("filter") or {}
+    filter_on = flt.get("enabled", False)
+    # 关键词表：优先读配置文件里的自定义表，没配就用内置的三层词表
+    strong_words = [w.lower() for w in (flt.get("includeAny") or FILTER_INCLUDE_ANY) if w]
+    broad_words = [w.lower() for w in (flt.get("includeAll") or FILTER_INCLUDE_ALL) if w]
+    exclude_words = [w.lower() for w in (flt.get("excludeAny") or FILTER_EXCLUDE_ANY) if w]
+
     merged = []
     seen = set()
     stats = []
+    filtered_out = 0
+
+    def item_text(m):
+        return (m["title"] + " " + m["summary"]).lower()
 
     for src in sources:
         if not src.get("enabled", True):
@@ -319,6 +420,9 @@ def build(config, out_path, dry_run=False):
         if not url:
             stats.append((name, "跳过", "未配置 url"))
             continue
+        # tier: vertical = 垂类媒体（本身就是宠物/食品行业），整源放行
+        # tier: general  = 泛资讯源，必须命中关键词才保留
+        tier = (src.get("tier") or "general").lower()
         try:
             text = fetch(url)
             raws = parse_feed(text)
@@ -327,33 +431,36 @@ def build(config, out_path, dry_run=False):
             continue
 
         kept = 0
+        src_filtered = 0
         for raw in raws:
             item = normalize(raw, src)
             if not item:
                 continue
             if item["date"] and item["date"] < cutoff:
                 continue
+            if filter_on and tier != "vertical":
+                t = item_text(item)
+                if any(x in t for x in exclude_words):
+                    src_filtered += 1
+                    continue
+                hit = any(w in t for w in strong_words)
+                if not hit and broad_words:
+                    # 宽泛词只在同时命中至少一个强词时才有效
+                    hit = any(w in t for w in broad_words) and any(
+                        w in t for w in strong_words)
+                if not hit:
+                    src_filtered += 1
+                    continue
             key = (item["title"], item["url"])
             if key in seen:
                 continue
             seen.add(key)
             merged.append(item)
             kept += 1
-        stats.append((name, "成功", "%d 条" % kept))
+        filtered_out += src_filtered
+        extra = "（过滤掉 %d 条）" % src_filtered if src_filtered else ""
+        stats.append((name, "成功", "%d 条%s" % (kept, extra)))
         time.sleep(0.4)  # 轻微限速，别把人家源打挂
-
-    # 全局关键词过滤：只保留与宠物 / 宠物食品相关的条目
-    flt = config.get("filter") or {}
-    if flt.get("enabled", False):
-        words = [w for w in (flt.get("includeAny") or []) if w]
-        if words:
-            before = len(merged)
-            merged = [m for m in merged
-                      if any(w in (m["title"] + " " + m["summary"]) for w in words)]
-            print("  关键词过滤：%d → %d 条（命中 %s）"
-                  % (before, len(merged), "/".join(words[:6]) + "…"))
-            # 过滤后重建去重表，避免与后面合并冲突
-            seen = set((m["title"], m["url"]) for m in merged)
 
     # 日期倒序（无日期的排最后），再截断
     merged.sort(key=lambda x: (x["date"] or "0000-00-00"), reverse=True)

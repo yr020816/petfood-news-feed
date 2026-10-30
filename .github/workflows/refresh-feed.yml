@@ -6,6 +6,15 @@ on:
   schedule:
     - cron: "17 7 * * *"     # 每天 UTC 07:17（北京时间 15:17）
   workflow_dispatch:          # 也可以在网页上手动点一次立即刷新
+  push:                       # 改了配置/脚本后推送，自动重建并重新部署
+    branches: [main]
+    paths:
+      - "build_feed.py"
+      - "sources.json"
+      - ".github/workflows/refresh-feed.yml"
+      - "index.html"
+    # 注意：不要把 feed.json 写进 paths，否则脚本自动提交 feed.json
+    # 会再次触发本 workflow，形成无限循环。
 
 permissions:
   contents: write
