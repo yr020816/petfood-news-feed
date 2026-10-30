@@ -27,9 +27,15 @@ jobs:
   build:
     name: 聚合并提交 feed.json
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          # 必须完整克隆：默认 fetch-depth:1 是浅克隆，本地没有远端历史，
+          # 后面 git push 会被拒（! [rejected] main -> main (fetch first)）
+          fetch-depth: 0
 
       - name: 安装 Python
         uses: actions/setup-python@v5
@@ -56,18 +62,25 @@ jobs:
         run: python3 "${{ steps.locate.outputs.dir }}/build_feed.py"
 
       - name: 提交更新
+        id: commit
         run: |
           cd "$GITHUB_WORKSPACE"
           FEED="${{ steps.locate.outputs.dir }}/feed.json"
           if git diff --quiet -- "$FEED"; then
             echo "内容无变化，跳过提交"
+            echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name  "feed-bot"
           git config user.email "feed-bot@users.noreply.github.com"
           git add "$FEED"
           git commit -m "chore: 更新 feed.json ($(date -u +%Y-%m-%d\ %H:%M))"
-          git push
+          # 先拉取远端最新提交再 rebase，避免与别人（或本机一键推送）的提交冲突
+          git pull --rebase --autostash origin "${{ github.ref_name }}" || {
+            echo "::warning::rebase 失败，改为直接推送（若被拒说明远端已前进）"
+          }
+          git push origin "HEAD:${{ github.ref_name }}"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   # 发布到 GitHub Pages
   # 需要在仓库 Settings → Pages 里把 Source 选成 "GitHub Actions"
@@ -85,6 +98,13 @@ jobs:
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+        with:
+          # 精确检出 build job 产出的那个提交，保证 Pages 上的 feed.json
+          # 就是本次刚生成的内容（而不是竞态下的旧版本）
+          ref: ${{ needs.build.outputs.sha }}
+          # 必须完整克隆：默认 fetch-depth:1 是浅克隆，本地没有远端历史，
+          # 后面 git push 会被拒（! [rejected] main -> main (fetch first)）
+          fetch-depth: 0
 
       - name: 定位脚本目录
         id: locate
