@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>宠物食品行业资讯订阅源</title>
+<style>
+  :root{color-scheme:light}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f6f7f9;color:#1f2328;font:15px/1.7 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:780px;margin:0 auto;padding:28px 18px 60px}
+  h1{font-size:22px;margin:0 0 6px}
+  .meta{color:#656d76;font-size:13px;margin-bottom:18px}
+  .meta b{color:#0969da}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .tag{background:#eaeef2;border-radius:999px;padding:3px 11px;font-size:12px;color:#424a53}
+  .tag.on{background:#ddf4ff;color:#0969da;font-weight:600}
+  ul{list-style:none;margin:0;padding:0}
+  li{background:#fff;border:1px solid #d8dee4;border-radius:8px;padding:14px 16px;margin-bottom:10px}
+  li a{color:#0969da;text-decoration:none;font-weight:600;font-size:16px}
+  li a:hover{text-decoration:underline}
+  li p{margin:6px 0 0;color:#57606a;font-size:14px}
+  .foot{color:#8b949e;font-size:13px;margin-top:20px;line-height:1.9}
+  .foot code{background:#eaeef2;padding:2px 6px;border-radius:4px;font-size:12px}
+  .empty{color:#8b949e;text-align:center;padding:40px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐾 宠物食品行业资讯订阅源</h1>
+  <div class="meta">最后更新：<b id="upd">读取中…</b> · 共 <b id="cnt">–</b> 条</div>
+  <div class="bar" id="cats"></div>
+  <ul id="list"><li class="empty">加载中…</li></ul>
+  <div class="foot">
+    本文件由 GitHub Actions 每日自动聚合生成，供「猫粮配方分析」小程序拉取。<br>
+    小程序订阅源地址：<code id="url"></code><br>
+    若页面显示正常但小程序拉取失败，请检查微信后台 request 合法域名是否已配置。
+  </div>
+</div>
+<script>
+(function(){
+  var CAT = {policy:'政策法规',factory:'工厂产能',capital:'资本融资',data:'行业数据',brand:'品牌动态'};
+  var cur = 'all';
+  var all = [];
+  function el(id){return document.getElementById(id)}
+  function render(){
+    var list = cur==='all' ? all : all.filter(function(n){return n.category===cur});
+    el('cnt').textContent = list.length;
+    var ul = el('list');
+    if(!list.length){ ul.innerHTML = '<li class="empty">该分类下暂无内容</li>'; return; }
+    ul.innerHTML = list.map(function(n){
+      var t = (n.title||'').replace(/[<>&]/g,function(m){return {'<':'<','>':'>','&':'&'}[m]});
+      var s = (n.summary||'').replace(/[<>&]/g,function(m){return {'<':'<','>':'>','&':'&'}[m]});
+      var u = n.url||'';
+      var head = u ? '<a href="'+u+'" target="_blank" rel="noopener">'+t+'</a>' : t;
+      return '<li>'+head+'<p>'+(s||'')+'</p></li>';
+    }).join('');
+  }
+  function cats(){
+    var keys = Object.keys(CAT);
+    var counts = {};
+    all.forEach(function(n){counts[n.category]=(counts[n.category]||0)+1});
+    var html = '<span class="tag'+(cur==='all'?' on':'')+'" data-c="all">全部 '+all.length+'</span>';
+    keys.forEach(function(k){
+      if(!counts[k]) return;
+      html += '<span class="tag'+(cur===k?' on':'')+'" data-c="'+k+'">'+CAT[k]+' '+counts[k]+'</span>';
+    });
+    el('cats').innerHTML = html;
+    Array.prototype.forEach.call(el('cats').children, function(t){
+      t.onclick = function(){cur = t.getAttribute('data-c'); cats(); render()};
+    });
+  }
+  fetch('feed.json?t=' + Date.now())
+    .then(function(r){ return r.json() })
+    .then(function(d){
+      all = Array.isArray(d) ? d : (d.items || d.data || []);
+      var newest = all.map(function(n){return n.date||''}).sort().pop();
+      el('upd').textContent = newest || '未知';
+      el('url').textContent = location.origin + location.pathname.replace(/[^/]*$/,'') + 'feed.json';
+      cats(); render();
+    })
+    .catch(function(e){
+      el('list').innerHTML = '<li class="empty">加载失败：'+e.message+'（若是首次部署，等 Pages 发布完成后再刷新）</li>';
+      el('upd').textContent = '加载失败';
+    });
+})();
+</script>
+</body>
+</html>

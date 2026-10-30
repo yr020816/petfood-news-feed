@@ -1,0 +1,71 @@
+{
+  "_说明": [
+    "这些源都经过实测可正常抓取解析（2026-10 验证）。单个源失效不影响整体，脚本会跳过并报告。",
+    "把 url 换成你真正想订阅的源即可；enabled=false 的源会被跳过。",
+    "category 是该源的兜底分类（标题/摘要匹配不到关键词时使用）。",
+    "支持 RSS 2.0 / Atom / JSON 数组三种格式，脚本自动识别，无需额外配置。",
+    "filter.includeAny：只保留命中任一关键词的条目（小程序是猫粮工具，默认做宠物/食品垂类过滤）。",
+    "   想收全量新闻就把 filter.enabled 改成 false。",
+    "首次配置建议只开 2-3 个源，跑通后再逐步增加。"
+  ],
+  "filter": {
+    "enabled": true,
+    "includeAny": [
+      "宠物", "猫", "狗", "犬", "猫粮", "狗粮", "主粮", "冻干",
+      "饲料", "宠物食品", "宠物经济", "宠物行业", "养宠", "萌宠",
+      "代工", "食品", "营养", "配料", "原料", "零食", "罐头", "烘焙",
+      "海关", "出口", "进口", "电商", "天猫", "京东", "零售", "展会",
+      "标准", "监管", "政策", "法规", "备案", "收购", "投资", "融资"
+    ]
+  },
+  "sources": [
+    {
+      "name": "国家统计局",
+      "url": "http://www.stats.gov.cn/sj/sjjd/rss.xml",
+      "category": "data",
+      "enabled": true
+    },
+    {
+      "name": "中新网·财经",
+      "url": "https://www.chinanews.com.cn/rss/finance.xml",
+      "category": "capital",
+      "enabled": true
+    },
+    {
+      "name": "中新网·社会",
+      "url": "https://www.chinanews.com.cn/rss/scroll-news.xml",
+      "category": "data",
+      "enabled": true
+    },
+    {
+      "name": "人民网·财经",
+      "url": "http://www.people.com.cn/rss/finance.xml",
+      "category": "capital",
+      "enabled": true
+    },
+    {
+      "name": "人民网·社会",
+      "url": "http://www.people.com.cn/rss/society.xml",
+      "category": "data",
+      "enabled": true
+    },
+    {
+      "name": "Petfood Industry",
+      "url": "https://www.petfoodindustry.com/rss",
+      "category": "brand",
+      "enabled": true
+    },
+    {
+      "name": "钛媒体",
+      "url": "https://www.tmtpost.com/feed",
+      "category": "capital",
+      "enabled": false
+    },
+    {
+      "name": "新浪科技",
+      "url": "https://rss.sina.com.cn/tech/rollnews.xml",
+      "category": "data",
+      "enabled": false
+    }
+  ]
+}

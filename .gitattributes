@@ -1,0 +1,9 @@
+# 统一换行符：让 Linux 上的 GitHub Actions 能正确执行 .sh 脚本
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.md text eol=lf

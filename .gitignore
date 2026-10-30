@@ -1,0 +1,6 @@
+# 本地 Token 与日志，绝不能进仓库
+token.txt
+push_log.txt
+_tmp_*.txt
+__pycache__/
+*.pyc

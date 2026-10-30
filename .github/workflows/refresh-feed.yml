@@ -1,0 +1,104 @@
+name: 刷新新闻订阅源
+
+# 每天自动跑一次，聚合并提交 feed.json
+# 说明：故意不用整点（GitHub Actions 整点任务排队严重，容易延迟十几分钟）
+on:
+  schedule:
+    - cron: "17 7 * * *"     # 每天 UTC 07:17（北京时间 15:17）
+  workflow_dispatch:          # 也可以在网页上手动点一次立即刷新
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-feed
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 聚合并提交 feed.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 兼容两种推送方式，脚本目录自动定位：
+      #   方式 A（推荐）：单独建一个仓库，只放本目录内容 → 脚本在仓库根
+      #   方式 B：整个项目推上去            → 脚本在 tools/news-feed/
+      - name: 定位脚本目录
+        id: locate
+        run: |
+          if [ -f "build_feed.py" ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          elif [ -f "tools/news-feed/build_feed.py" ]; then
+            echo "dir=tools/news-feed" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::未找到 build_feed.py，请检查仓库结构"
+            exit 1
+          fi
+          echo "脚本目录：${{ steps.locate.outputs.dir }}"
+
+      - name: 聚合订阅源
+        run: python3 "${{ steps.locate.outputs.dir }}/build_feed.py"
+
+      - name: 提交更新
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          FEED="${{ steps.locate.outputs.dir }}/feed.json"
+          if git diff --quiet -- "$FEED"; then
+            echo "内容无变化，跳过提交"
+            exit 0
+          fi
+          git config user.name  "feed-bot"
+          git config user.email "feed-bot@users.noreply.github.com"
+          git add "$FEED"
+          git commit -m "chore: 更新 feed.json ($(date -u +%Y-%m-%d\ %H:%M))"
+          git push
+
+  # 发布到 GitHub Pages
+  # 需要在仓库 Settings → Pages 里把 Source 选成 "GitHub Actions"
+  pages:
+    name: 发布到 GitHub Pages
+    needs: build
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 定位脚本目录
+        id: locate
+        run: |
+          if [ -f "build_feed.py" ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          elif [ -f "tools/news-feed/build_feed.py" ]; then
+            echo "dir=tools/news-feed" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::未找到 build_feed.py"
+            exit 1
+          fi
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+
+      # 整个目录一起发布，这样微信域名校验文件 MP_verify_xxx.txt
+      # 必须和 feed.json 放在同一层，才能通过 https://域名/MP_verify_xxx.txt 访问到
+      - name: 部署静态文件
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ steps.locate.outputs.dir }}
+
+      - name: 发布
+        id: deployment
+        uses: actions/deploy-pages@v4
