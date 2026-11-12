@@ -1,5 +1,45 @@
 [
   {
+    "title": "Pet’s Table expands Mexico’s fresh pet food market with new plant",
+    "summary": "The producer of freshly cooked and frozen pet food has grown from a small startup kitchen to a 6,000-square-meter facility near...",
+    "url": "https://www.petfoodindustry.com/regions/latin-america-carribean/article/16425359/pets-table-expands-mexicos-fresh-pet-food-market-with-new-plant",
+    "date": "2026-11-11",
+    "category": "factory",
+    "source": "Petfood Industry"
+  },
+  {
+    "title": "Expand, redesign or end? Deciding the fate of a pet food sustainability program",
+    "summary": "Pet food industry leaders discussed how they weigh environmental versus financial priorities when deciding which sustainability...",
+    "url": "https://www.petfoodindustry.com/business-strategy/article/16425330/expand-redesign-or-end-deciding-the-fate-of-a-pet-food-sustainability-program",
+    "date": "2026-11-11",
+    "category": "brand",
+    "source": "Petfood Industry"
+  },
+  {
+    "title": "Changes are coming: FDA's GRAS proposal impacts animal food",
+    "summary": "The FDA's proposed overhaul of the GRAS notification process would reshape how pet food ingredients reach the market, and AFIA...",
+    "url": "https://www.petfoodindustry.com/blogs-columns/pet-food-insights/article/15833854/changes-are-coming-fdas-gras-proposal-impacts-animal-food",
+    "date": "2026-11-11",
+    "category": "brand",
+    "source": "Petfood Industry"
+  },
+  {
+    "title": "Sustainable pet food needs more than environmental claims to sell",
+    "summary": "Pet food industry executives say nutrition, price, accessibility and brand recognition play larger roles in consumer purchasing...",
+    "url": "https://www.petfoodindustry.com/pet-food-marketing-and-branding/article/16425210/sustainable-pet-food-needs-more-than-environmental-claims-to-sell",
+    "date": "2026-11-11",
+    "category": "brand",
+    "source": "Petfood Industry"
+  },
+  {
+    "title": "A to Z of Pet Food: Recipes",
+    "summary": "Join the Pet Food Institute (PFI) as we continue our look at pet food, from A to Z. Click here to revisit our previous post on Proteins. Pet food recipes are carefully developed to provide your dog or cat with the comple…",
+    "url": "https://www.petfoodinstitute.org/pet-food-recipes/",
+    "date": "2026-11-11",
+    "category": "brand",
+    "source": "Pet Food Institute"
+  },
+  {
     "title": "Bison co-products in pet food support regenerative ranching",
     "summary": "At West Bijou Ranch, bison ranchers explained how pet food ingredients, whole-animal utilization and grazing management contribute...",
     "url": "https://www.petfoodindustry.com/sustainable-dog-and-cat-food/article/16425094/bison-coproducts-in-pet-food-support-regenerative-ranching",
@@ -48,36 +88,44 @@
     "source": "Petfood Industry"
   },
   {
-    "title": "Changes are coming: FDA's GRAS proposal impacts animal food",
-    "summary": "The FDA's proposed overhaul of the GRAS notification process would reshape how pet food ingredients reach the market, and AFIA...",
-    "url": "https://www.petfoodindustry.com/blogs-columns/pet-food-insights/article/15833854/changes-are-coming-fdas-gras-proposal-impacts-animal-food",
+    "title": "IskayPet addresses barriers to pet integration",
+    "summary": "Grupo IskayPet and the Spanish law firm Cremades & Calvo-Sotelo Abogados brought together government representatives and experts from the healthcare, veterinary, social and business sectors for the Third Society and Anim…",
+    "url": "https://www.petworldwide.net/content-1/news/2026/11/10/plus/iskaypet-addresses-barriers-to-pet-integration.html",
+    "date": "2026-11-10",
+    "category": "capital",
+    "source": "PET worldwide"
+  },
+  {
+    "title": "Yellow accessories signal dogs need space",
+    "summary": "When people see a dog out for a walk, they often want to pet it or let their own dog say hello. But not every dog welcomes this attention. Sometimes, what a dog needs most is calm and a little extra space, be it due to m…",
+    "url": "https://www.petworldwide.net/content-1/news/2026/11/10/free/yellow-accessories-signal-dogs-need-space.html",
+    "date": "2026-11-10",
+    "category": "capital",
+    "source": "PET worldwide"
+  },
+  {
+    "title": "Kyflie expands into the cat segment",
+    "summary": "French pet equipment brand Kyflie is expanding its product portfolio with a new collection of cat harnesses and accessories, marking its first entry into the cat segment, according to a company press release. The launch …",
+    "url": "https://www.petworldwide.net/content-1/news/2026/11/10/free/kyflie-expands-into-the-cat-segment.html",
     "date": "2026-11-10",
     "category": "brand",
-    "source": "Petfood Industry"
+    "source": "PET worldwide"
   },
   {
-    "title": "Purina, Hill’s and Smucker strategies shift toward cat, wet and fresh",
-    "summary": "Top pet food companies are targeting specific pet food segments for growth as broader category conditions remain uneven.",
-    "url": "https://www.petfoodindustry.com/business-strategy/article/15834675/purina-hills-and-smucker-strategies-shift-toward-cat-wet-and-fresh",
+    "title": "PawsMenu combines dog meal planning with food tracking",
+    "summary": "Turkish animal nutrition specialist Dr Ercan Mevliyaoğulları has developed PawsMenu, an application that helps dog owners calculate food portions and monitor daily food intake. The app combines homemade meal planning wit…",
+    "url": "https://www.petworldwide.net/content-1/news/2026/11/10/free/pawsmenu-combines-dog-meal-planning-with-food-tracking.html",
     "date": "2026-11-10",
-    "category": "data",
-    "source": "Petfood Industry"
+    "category": "capital",
+    "source": "PET worldwide"
   },
   {
-    "title": "Pet treats market grows to $13.5 billion",
-    "summary": "Packaged Facts data show cat treat households grew 31% since 2020, outpacing a 2% drop among dog treat buyers, as Gen Z adoption...",
-    "url": "https://www.petfoodindustry.com/blogs-columns/market-report/article/15833736/pet-treats-market-grows-to-135-billion",
+    "title": "AOSN acquires portfolio of veterinary specialty practices",
+    "summary": "Animal Outpatient Specialty Network (AOSN) has acquired a portfolio of outpatient veterinary specialty practices in the US, according to a company press release. AOSN states that the acquisition makes it the country's la…",
+    "url": "https://www.petworldwide.net/content-1/news/2026/11/10/plus/aosn-acquires-veterinary-specialty-practice-portfolio.html",
     "date": "2026-11-10",
-    "category": "data",
-    "source": "Petfood Industry"
-  },
-  {
-    "title": "New pet food factory: Cosechas Argentinas bets on market recovery",
-    "summary": "The entry of another pet food manufacturer into the Argentinian market is a sign that companies continue to see opportunities...",
-    "url": "https://www.petfoodindustry.com/regions/latin-america-carribean/article/16425020/new-pet-food-factory-cosechas-argentinas-bets-on-market-recovery",
-    "date": "2026-11-09",
-    "category": "factory",
-    "source": "Petfood Industry"
+    "category": "capital",
+    "source": "PET worldwide"
   },
   {
     "title": "Musti Group reports strong sales growth",
@@ -228,46 +276,6 @@
     "summary": "Symrise has invested €1.7 million in a new training centre at its headquarters in Holzminden, Germany. The facility, which opened on 19 October, covers around 340 m² and combines workshop training with classroom instruct…",
     "url": "https://www.petworldwide.net/content-1/news/2026/10/22/free/symrise-opens-eur1-7-m-training-centre-in-holzminden.html",
     "date": "2026-10-22",
-    "category": "factory",
-    "source": "PET worldwide"
-  },
-  {
-    "title": "Edition Dog Live to be renamed Every Dog Live",
-    "summary": "The UK dog event Edition Dog Live will be renamed Every Dog Live in 2027, with organisers Raccoon Media Group and Edition Media Ltd announcing plans to nearly double its exhibition space and invest in additional content …",
-    "url": "https://www.petworldwide.net/content-1/news/2026/10/22/plus/edition-dog-live-to-be-renamed-every-dog-live.html",
-    "date": "2026-10-22",
-    "category": "capital",
-    "source": "PET worldwide"
-  },
-  {
-    "title": "Fressnapf | Maxi Zoo merges Benelux markets into one cluster",
-    "summary": "Fressnapf | Maxi Zoo is combining its operations in Belgium, the Netherlands and Luxembourg into a single BeNeLux cluster with effect from 1 January 2027. The cluster will be headed by Giane Van Landuyt, who joined the K…",
-    "url": "https://www.petworldwide.net/content-1/news/2026/10/21/free/fressnapf-maxi-zoo-merges-benelux-markets-into-one-cluster.html",
-    "date": "2026-10-21",
-    "category": "capital",
-    "source": "PET worldwide"
-  },
-  {
-    "title": "Zooplus reorganises its leadership team",
-    "summary": "Zooplus has announced the expansion of its Executive Committee under CEO Lionel Desclée. Four executives in the areas of marketing, sales, strategy & transformation, and product & technology are set to drive the implemen…",
-    "url": "https://www.petworldwide.net/content-1/news/2026/10/20/free/zooplus-reorganises-its-leadership-team.html",
-    "date": "2026-10-20",
-    "category": "capital",
-    "source": "PET worldwide"
-  },
-  {
-    "title": "Sebastian Gundel to become the new Kingfisher CEO",
-    "summary": "Sebastian Gundel, previously CEO of Obi, is to become the new head of Kingfisher. On 1 February 2027, he will take up the position of Chief Executive Officer, succeeding Thierry Garnier. Garnier will remain in post until…",
-    "url": "https://www.petworldwide.net/content-1/news/2026/10/20/plus/sebastian-gundel-to-become-the-new-kingfisher-ceo.html",
-    "date": "2026-10-20",
-    "category": "capital",
-    "source": "PET worldwide"
-  },
-  {
-    "title": "Südpack: Progress towards sustainability targets",
-    "summary": "The film manufacturer Südpack has published its sixth sustainability report. In it, the group documents progress in implementing its sustainability strategy up to 2030. The focus is on recyclable packaging solutions, red…",
-    "url": "https://www.petworldwide.net/content-1/news/2026/10/20/free/suedpack-progress-towards-sustainability-targets.html",
-    "date": "2026-10-20",
     "category": "factory",
     "source": "PET worldwide"
   },
